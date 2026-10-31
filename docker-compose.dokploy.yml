@@ -1,0 +1,56 @@
+# Mock API no Dokploy (Docker Compose): um serviço só, SQLite no volume "appdata".
+# Passo a passo no README ("Deploy no Dokploy"). Resumo:
+#   - Compose Path: ./docker-compose.dokploy.yml
+#   - Environment: APP_SECRET (obrigatória); o resto se configura na tela
+#   - Domains: serviço "app", porta 4310, HTTPS ligado
+# Sem "ports": quem recebe o tráfego é o Traefik do Dokploy, pelo domínio configurado na tela.
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    expose:
+      - "4310"
+    # dokploy-network: onde o Traefik do Dokploy alcança o app.
+    networks:
+      - default
+      - dokploy-network
+    environment:
+      APP_SECRET: ${APP_SECRET:?defina APP_SECRET no Environment do Dokploy}
+      # Opcional: exige este token para criar o primeiro admin (evita que outra pessoa chegue antes).
+      SETUP_TOKEN: ${SETUP_TOKEN:-}
+      # O Traefik do Dokploy é um salto; com Cloudflare (proxy laranja) na frente, use 2.
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # Valores iniciais opcionais das configurações da tela (a tela tem prioridade):
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+    volumes:
+      - appdata:/app/data
+    stop_grace_period: 20s
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4310/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    logging: *logging
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  appdata:

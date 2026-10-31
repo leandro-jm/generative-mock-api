@@ -1,0 +1,13 @@
+# Rodar local com Docker: docker compose up --build  →  http://localhost:4310
+services:
+  app:
+    build: .
+    ports:
+      - "4310:4310"
+    environment:
+      APP_SECRET: ${APP_SECRET:-troque-este-segredo-em-producao}
+    volumes:
+      - appdata:/app/data
+
+volumes:
+  appdata:
