@@ -1,5 +1,5 @@
 # Mock API: servidor (Fastify, TypeScript rodando direto no Node 24) servindo também o painel já construído.
-FROM node:24-slim AS base
+FROM node:25-slim AS base
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH CI=true
 RUN corepack enable
 WORKDIR /app
