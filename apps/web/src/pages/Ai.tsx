@@ -86,7 +86,7 @@ export function AiPage() {
     <div className="space-y-6">
       <PageHeader title="Gerar com IA" description="Descreva o domínio; a IA desenha os recursos, campos, gráficos, diagramas e ações. O servidor gera os dados localmente e publica CRUD, views e OpenAPI." />
       {status.data && !status.data.configured && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
+        <div className="rounded-lg border border-warning-border bg-warning-dim p-3 text-sm text-warning">
           Provedor de IA não configurado. {user.role === "admin" ? <Link to="/configuracoes" className="font-medium underline">Configure em Configurações → IA generativa.</Link> : "Peça para um admin configurar."}
         </div>
       )}
@@ -95,10 +95,10 @@ export function AiPage() {
           <Textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={3} placeholder="Ex.: API de academia com alunos, planos, check-ins por unidade (no mapa) e avaliações físicas" />
         </Field>
         <div className="flex flex-wrap gap-2">
-          {EXAMPLES.map((ex) => <button key={ex} onClick={() => setPrompt(ex)} className="rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-600 hover:border-indigo-300 hover:text-indigo-700 dark:border-slate-700 dark:text-slate-400">{ex}</button>)}
+          {EXAMPLES.map((ex) => <button key={ex} onClick={() => setPrompt(ex)} className="rounded-full border border-line px-3 py-1 text-xs text-fg-2 hover:border-line-strong hover:text-fg">{ex}</button>)}
         </div>
         <Button loading={busy === "gen" && !out} disabled={prompt.trim().length < 3 || busy !== null} onClick={() => run(prompt)}><Sparkles className="size-4" /> Gerar prévia</Button>
-        {busy === "gen" && <p className="text-xs text-slate-500">Gerando… pode levar de alguns segundos a alguns minutos, conforme o modelo.</p>}
+        {busy === "gen" && <p className="text-xs text-fg-3">Gerando… pode levar de alguns segundos a alguns minutos, conforme o modelo.</p>}
       </Card>
       <ErrorBox error={error} />
 
@@ -107,10 +107,10 @@ export function AiPage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold">{out.definition.title}</h2>
-              <p className="font-mono text-xs text-slate-500">/api/v1/{out.definition.slug}</p>
-              <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-400">{out.definition.description}</p>
+              <p className="font-mono text-xs text-fg-3">/api/v1/{out.definition.slug}</p>
+              <p className="mt-1 max-w-2xl text-sm text-fg-2">{out.definition.description}</p>
             </div>
-            <div className="text-right text-xs text-slate-500">
+            <div className="text-right text-xs text-fg-3">
               <p>{out.model} · {out.usage.inputTokens + out.usage.outputTokens} tokens</p>
               {out.repaired && <Badge tone="amber">corrigido automaticamente</Badge>}
             </div>
@@ -124,19 +124,19 @@ export function AiPage() {
           {tab === "resumo" && (
             <div className="grid gap-4 md:grid-cols-2">
               {out.definition.resources.map((r) => (
-                <div key={r.slug} className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
+                <div key={r.slug} className="rounded-lg border border-line p-3">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-medium">{r.labelPlural} <span className="font-mono text-xs text-slate-500">/{r.slug}</span></p>
-                    <label className="flex items-center gap-1 text-xs text-slate-500">registros <Input type="number" min={0} className="h-7 w-20 py-0 text-xs" value={counts[r.slug] ?? 0} onChange={(e) => setCounts({ ...counts, [r.slug]: Number(e.target.value) })} /></label>
+                    <p className="font-medium">{r.labelPlural} <span className="font-mono text-xs text-fg-3">/{r.slug}</span></p>
+                    <label className="flex items-center gap-1 text-xs text-fg-3">registros <Input type="number" min={0} className="h-7 w-20 py-0 text-xs" value={counts[r.slug] ?? 0} onChange={(e) => setCounts({ ...counts, [r.slug]: Number(e.target.value) })} /></label>
                   </div>
                   <ul className="mt-2 space-y-0.5 text-xs">
                     {r.fields.map((f) => (
-                      <li key={f.name}><span className="font-mono">{f.name}</span> <span className="text-slate-500">{f.type}{f.ref ? ` → ${f.ref}` : ""}{f.format ? ` (${f.format})` : ""}</span>{f.required && <span className="text-rose-500"> *</span>}</li>
+                      <li key={f.name}><span className="font-mono">{f.name}</span> <span className="text-fg-3">{f.type}{f.ref ? ` → ${f.ref}` : ""}{f.format ? ` (${f.format})` : ""}</span>{f.required && <span className="text-danger"> *</span>}</li>
                     ))}
                   </ul>
                 </div>
               ))}
-              <div className="rounded-lg border border-slate-200 p-3 text-xs dark:border-slate-800">
+              <div className="rounded-lg border border-line p-3 text-xs">
                 <p className="mb-1 font-medium">Gráficos</p>
                 {out.definition.charts?.map((c) => <p key={c.name}>{c.title}</p>) ?? "—"}
                 <p className="mt-2 mb-1 font-medium">Diagramas</p>
@@ -149,14 +149,14 @@ export function AiPage() {
               {Object.entries(out.preview).map(([r, rows]) => (
                 <div key={r}>
                   <p className="mb-1 text-sm font-medium">{r}</p>
-                  <pre className="max-h-64 overflow-auto rounded-lg bg-slate-950 p-3 font-mono text-xs text-slate-100">{JSON.stringify(rows.slice(0, 2), null, 2)}</pre>
+                  <pre className="max-h-64 overflow-auto rounded-lg border border-line bg-code p-3 font-mono text-xs text-fg">{JSON.stringify(rows.slice(0, 2), null, 2)}</pre>
                 </div>
               ))}
             </div>
           )}
           {tab === "json" && <Textarea value={defText} onChange={(e) => setDefText(e.target.value)} className="min-h-[50vh] font-mono text-xs" spellCheck={false} />}
 
-          <div className="flex flex-wrap items-end gap-3 border-t border-slate-200 pt-4 dark:border-slate-800">
+          <div className="flex flex-wrap items-end gap-3 border-t border-line pt-4">
             <Field label="Refinar" className="min-w-64 flex-1"><Input value={refine} onChange={(e) => setRefine(e.target.value)} placeholder="Ex.: troque consultas por agendamentos e adicione forma de pagamento" /></Field>
             <Button variant="secondary" disabled={!refine.trim() || busy !== null} loading={busy === "gen"} onClick={() => run(refine, out.history)}>Refinar</Button>
             <Button loading={busy === "save"} disabled={busy !== null} onClick={save}>Salvar e publicar</Button>

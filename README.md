@@ -1,37 +1,45 @@
 # Mock API
 
-APIs com dados fictícios seguindo **OpenAPI 3.1**, com autenticação, documentação Swagger e um painel para configurar tudo. Serve para testes, demos e protótipos de front.
+[![CI](https://github.com/leandro-jm/generative-mock-api/actions/workflows/ci.yml/badge.svg)](https://github.com/leandro-jm/generative-mock-api/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+![Node ≥ 24](https://img.shields.io/badge/node-%E2%89%A524-339933)
 
-- **3 módulos prontos**: RH Trabalhista, Filmes (com pôster e backdrop) e Livros (com capa). Dados coerentes, com CPF, CNPJ, PIS e ISBN válidos, gerados por semente.
-- **Gerar com IA**: descreva um domínio ("clínica veterinária com tutores, pets e consultas") e a IA desenha recursos, campos, gráficos, diagramas e ações. O servidor gera os dados e publica CRUD, views e OpenAPI na hora. Funciona com Anthropic (Claude) ou qualquer API compatível com OpenAI (OpenAI, OpenRouter, Groq, Ollama).
-- **7 views para o front**, com formato fixo em todo módulo: `table`, `card`, `form`, `plan` (ação com confirmação), `map` (GeoJSON), `chart` e `diagram`.
-- **Swagger UI** em `/docs` e spec em `/openapi.json` / `/openapi.yaml` (tudo) ou `/openapi/<módulo>.json`.
-- **Configurações na tela**: tudo que seria variável de ambiente fica em Configurações e vale na hora (precedência: tela > env > padrão).
-- **Login criado no primeiro acesso** e cadastro de usuários (admin, editor, viewer) pela tela.
-- **Deploy no Dokploy** com um único container e SQLite em volume.
+**English** · [Português](README.pt-BR.md)
 
-## Rodar local
+Fake-data APIs that follow **OpenAPI 3.1**, with authentication, Swagger docs and a web panel to configure everything. Built for tests, demos and front-end prototypes.
 
-Pré-requisitos: Node 24+ e pnpm.
+> The web panel and the generated sample data are in Brazilian Portuguese (pt-BR). Panel labels are quoted below in Portuguese, with a translation the first time they appear.
+
+- **3 ready-made modules**: HR/labor (RH Trabalhista), Movies (Filmes, with posters and backdrops) and Books (Livros, with covers). Consistent, seeded data with valid Brazilian documents (CPF, CNPJ, PIS) and ISBNs.
+- **Generate with AI**: describe a domain ("veterinary clinic with owners, pets and appointments") and the AI designs resources, fields, charts, diagrams and actions. The server generates the data and publishes CRUD, views and OpenAPI right away. Works with Anthropic (Claude) or any OpenAI-compatible API (OpenAI, OpenRouter, Groq, Ollama).
+- **7 views for the front end**, with the same shape in every module: `table`, `card`, `form`, `plan` (action with confirmation), `map` (GeoJSON), `chart` and `diagram`.
+- **Swagger UI** at `/docs`, and the spec at `/openapi.json` / `/openapi.yaml` (everything) or `/openapi/<module>.json`.
+- **Settings in the panel**: everything that would be an environment variable lives in **Configurações** (Settings) and applies immediately (precedence: panel > env > default).
+- **Login created on first access**, plus user management (admin, editor, viewer) in the panel.
+- **Single-container deploy** (Docker, Dokploy) with SQLite on a volume.
+
+## Run locally
+
+Requirements: Node 24+ and pnpm (`corepack enable`).
 
 ```bash
 pnpm install
-pnpm dev          # servidor em :4310 e painel (Vite) em :5173
+pnpm dev          # server on :4310 and panel (Vite) on :5173
 ```
 
-Abra http://localhost:5173, crie o admin e pronto. Os dados ficam em `apps/server/data` (SQLite); para outro lugar, defina `DATA_DIR` num `.env` na raiz (veja `.env.example`).
+Open http://localhost:5173, create the admin and you're done. Data lives in `apps/server/data` (SQLite); to put it elsewhere, set `DATA_DIR` in a `.env` at the repo root (see `.env.example`).
 
-Ou com Docker:
+Or with Docker:
 
 ```bash
 docker compose up --build   # http://localhost:4310
 ```
 
-Testes: `pnpm test` (Vitest: cálculos, query, auth, CRUD, as 7 views, planos, OpenAPI válida, IA com provedor falso). Tipos: `pnpm typecheck`.
+Tests: `pnpm test` (Vitest: calculations, query, auth, CRUD, the 7 views, plans, valid OpenAPI, AI with a fake provider). Types: `pnpm typecheck`.
 
-## Usando as APIs
+## Using the APIs
 
-Crie uma chave em **API Keys** e envie no header, ou troque por um JWT:
+Create a key in **API Keys** and send it in a header, or exchange it for a JWT:
 
 ```bash
 curl -H "X-API-Key: mk_..." "http://localhost:4310/api/v1/filmes/filmes?limit=5&sort=-ano"
@@ -41,117 +49,137 @@ curl -X POST http://localhost:4310/api/v1/auth/token \
 # → { "access_token": "...", "token_type": "Bearer", "expires_in": 3600 }
 ```
 
-Também aceita `{ "email", "password" }` de um usuário do painel. Chaves têm scopes: `*`, `*:read`, `<módulo>:read`, `<módulo>:write`.
+`{ "email", "password" }` of a panel user also works. Keys have scopes: `*`, `*:read`, `<module>:read`, `<module>:write`.
 
-### Listagens
+### Listing
 
-`GET /api/v1/<módulo>/<recurso>` aceita:
+`GET /api/v1/<module>/<resource>` accepts:
 
-| Parâmetro | Exemplo |
+| Parameter | Example |
 | --- | --- |
-| `page`, `limit` | `?page=2&limit=50` (total em `X-Total-Count`, links em `Link`) |
+| `page`, `limit` | `?page=2&limit=50` (total in `X-Total-Count`, links in `Link`) |
 | `sort` | `?sort=-preco,titulo` |
-| `q` | `?q=farol` (sem acento, sem diferenciar maiúsculas) |
-| filtros | `?status=Ativo`, `?preco[gte]=50`, `?generos=Fantasia`, `?uf[in]=SP,RJ`, `?nome[like]=silva` |
+| `q` | `?q=farol` (accent- and case-insensitive) |
+| filters | `?status=Ativo`, `?preco[gte]=50`, `?generos=Fantasia`, `?uf[in]=SP,RJ`, `?nome[like]=silva` |
 | `fields` | `?fields=titulo,ano` |
-| `expand` | `?expand=diretor_id,elenco_ids` (embute os registros referenciados) |
+| `expand` | `?expand=diretor_id,elenco_ids` (embeds the referenced records) |
 
-Erros seguem `application/problem+json` (RFC 9457), com `errors[]` por campo quando o corpo não segue o schema.
+Errors follow `application/problem+json` (RFC 9457), with per-field `errors[]` when the body does not match the schema.
 
 ### Views
 
-| View | Endpoint | Formato |
+| View | Endpoint | Shape |
 | --- | --- | --- |
-| table | `GET …/<recurso>/_views/table` | colunas + página de dados com rótulos das referências |
-| card | `GET …/<recurso>/_views/card[?id=]` | `{ title, subtitle, image, badges, description, fields }` |
-| form | `GET …/<recurso>/_views/form?mode=create\|edit&id=` | JSON Schema + uiSchema (widgets, máscaras, opções, etapas) + valores iniciais |
-| plan | `POST …/<módulo>/plans` → `POST …/plans/{id}/confirm` | impacto (excluir, alterar, desvincular, criar, com diff) + confirmação |
-| map | `GET …/<recurso>/_views/map` | GeoJSON `FeatureCollection` (Point, LineString, Polygon) |
-| chart | `GET …/<módulo>/_views/charts/<nome>` ou `…/<recurso>/_views/chart?groupBy=&metric=` | `{ type, labels, series[] }` |
-| diagram | `GET …/<módulo>/_views/diagrams/<nome>` | `{ kind: tree\|graph\|flow, nodes, edges }` |
+| table | `GET …/<resource>/_views/table` | columns + a page of data with reference labels |
+| card | `GET …/<resource>/_views/card[?id=]` | `{ title, subtitle, image, badges, description, fields }` |
+| form | `GET …/<resource>/_views/form?mode=create\|edit&id=` | JSON Schema + uiSchema (widgets, masks, options, steps) + initial values |
+| plan | `POST …/<module>/plans` → `POST …/plans/{id}/confirm` | impact (delete, update, unlink, create, with diff) + confirmation |
+| map | `GET …/<resource>/_views/map` | GeoJSON `FeatureCollection` (Point, LineString, Polygon) |
+| chart | `GET …/<module>/_views/charts/<name>` or `…/<resource>/_views/chart?groupBy=&metric=` | `{ type, labels, series[] }` |
+| diagram | `GET …/<module>/_views/diagrams/<name>` | `{ kind: tree\|graph\|flow, nodes, edges }` |
 
-A **Galeria de views** do painel desenha cada uma delas a partir desses endpoints.
+The panel's **Galeria de views** (view gallery) renders each of them from these endpoints.
 
-**Plan** é a ação que pede confirmação do usuário: nada muda até o `confirm`. Exclusões calculam a cascata pelas referências (cascade, unlink ou restrict, este último bloqueia). Há ações em lote (reajuste de preço ou salário com diff por registro) e ações do domínio (no RH: desligar colaborador, que calcula a rescisão, cria o S-2299, encerra benefícios e cancela escalas). Ações graves exigem uma frase (`EXCLUIR 12 REGISTROS`, `CONFIRMAR`). O confirm responde 409 se os dados mudaram depois do plano e 410 se ele expirou. Com **Exigir plano para excluir** ligado, um `DELETE` direto responde 428 trazendo o plano; repita com `X-Confirm-Plan: <id>`.
+**Plan** is the action that asks the user to confirm: nothing changes until `confirm`. Deletes compute the cascade through references (cascade, unlink or restrict; restrict blocks). There are batch actions (price or salary adjustment with a per-record diff) and domain actions (in HR: dismissing an employee, which computes the severance, creates the eSocial S-2299 event, ends benefits and cancels shifts). Serious actions require a phrase (`EXCLUIR 12 REGISTROS`, `CONFIRMAR`). Confirm answers 409 if the data changed after the plan and 410 if it expired. With **Exigir plano para excluir** (require a plan to delete) on, a direct `DELETE` answers 428 with the plan; repeat it with `X-Confirm-Plan: <id>`.
 
-### Imagens
+### Images
 
-Pôsteres, backdrops, capas e fotos são desenhados pelo servidor, determinísticos por registro: `…/filmes/filmes/1/poster.svg`, `…/livros/livros/1/capa.png?w=300`. Por padrão abrem sem autenticação (para usar em `<img>`); desligue em Configurações → Autenticação.
+Posters, backdrops, covers and photos are drawn by the server, deterministic per record: `…/filmes/filmes/1/poster.svg`, `…/livros/livros/1/capa.png?w=300`. By default they are served without authentication (so they work in `<img>`); turn that off in Configurações → Autenticação.
 
-### Simulação
+### Simulation
 
-Em qualquer chamada: `X-Mock-Delay: 1500` (atraso em ms) e `X-Mock-Status: 503` (força o erro). Em Configurações → Comportamento do mock: latência mínima e máxima, taxa de erro aleatória e limite de requisições por minuto.
+On any call: `X-Mock-Delay: 1500` (delay in ms) and `X-Mock-Status: 503` (forces the error). In Configurações → Comportamento do mock (mock behavior): minimum and maximum latency, random error rate and requests-per-minute limit.
 
-## Módulos prontos
+## Ready-made modules
 
-| Módulo | Recursos | Destaques |
+| Module | Resources | Highlights |
 | --- | --- | --- |
-| **RH Trabalhista** (`/api/v1/rh`) | empresas, departamentos, cargos, postos-trabalho, colaboradores, escalas, marcações de ponto, rondas, holerites, férias, afastamentos, benefícios, rescisões, eventos eSocial | Organograma (tree), postos com cerca virtual (Polygon), ponto geolocalizado dentro ou fora da cerca, rondas (LineString), holerites com INSS e IRRF, turnover; cálculos em `POST /calculos/{inss,irrf,ferias,rescisao}`; planos: desligar colaborador, excluir departamento realocando pessoas, aprovar férias, reajuste salarial |
-| **Filmes** (`/api/v1/filmes`) | gêneros, pessoas, filmes, avaliações, locações, cinemas | Pôster, backdrop e fotos gerados; títulos fictícios; locações de filmagem e cinemas no mapa; grafo elenco e direção; bilheteria por ano e gênero |
-| **Livros** (`/api/v1/livros`) | editoras, autores, séries, livros, avaliações, livrarias, vendas | Capas geradas; ISBN-10/13 válidos (`GET /livros/isbn/{isbn}`); livrarias e bibliotecas no mapa; vendas por mês e canal; grafo autor, livro e editora; reajuste de preço em lote |
+| **RH Trabalhista** (`/api/v1/rh`) | companies, departments, positions, work sites, employees, shifts, time punches, patrols, payslips, vacations, leaves, benefits, terminations, eSocial events | Org chart (tree), work sites with geofences (Polygon), geolocated time punches inside or outside the fence, patrols (LineString), payslips with INSS and IRRF, turnover; calculations at `POST /calculos/{inss,irrf,ferias,rescisao}`; plans: dismiss employee, delete department reallocating people, approve vacation, salary adjustment |
+| **Filmes** (`/api/v1/filmes`) | genres, people, movies, reviews, rentals, theaters | Generated posters, backdrops and photos; fictional titles; filming locations and theaters on the map; cast and director graph; box office by year and genre |
+| **Livros** (`/api/v1/livros`) | publishers, authors, series, books, reviews, bookstores, sales | Generated covers; valid ISBN-10/13 (`GET /livros/isbn/{isbn}`); bookstores and libraries on the map; sales by month and channel; author, book and publisher graph; batch price adjustment |
 
-As tabelas de INSS e IRRF ficam em Configurações → RH Trabalhista. Os valores são ilustrativos e servem para teste, não para cálculos reais.
+Resource and field names are in Portuguese (`colaboradores`, `filmes`, `livros`, …). The INSS and IRRF tables live in Configurações → RH Trabalhista. The values are illustrative and meant for testing, not for real payroll calculations.
 
-## Gerar com IA
+## Generate with AI
 
-1. Em **Configurações → IA generativa**, escolha o provedor e informe a chave (fica cifrada no banco). Use **Testar conexão** para conferir.
-   - **Anthropic**: modelo padrão `claude-opus-5-5`, com esforço configurável e fallback automático em caso de recusa.
-   - **OpenAI-compatível**: base URL e modelo livres. Se o provedor não aceitar `json_schema`, desligue "Saída estruturada".
-2. Em **Gerar com IA**, descreva o domínio. A prévia mostra os recursos, quais das 7 views o módulo cobre (com um botão para pedir à IA que cubra as que faltam), uma amostra de dados e a definição em JSON, que dá para editar.
-3. **Refine** em linguagem natural quantas vezes quiser e clique em **Salvar e publicar**. Os endpoints entram no ar e na documentação na hora.
+1. In **Configurações → IA generativa** (generative AI), choose the provider and enter the key (stored encrypted in the database). Use **Testar conexão** (test connection) to check it.
+   - **Anthropic**: default model `claude-opus-5-5`, with configurable effort and automatic fallback on refusal.
+   - **OpenAI-compatible**: free base URL and model. If the provider does not accept `json_schema`, turn off "Saída estruturada" (structured output).
+2. In **Gerar com IA** (generate with AI), describe the domain. The preview shows the resources, which of the 7 views the module covers (with a button asking the AI to cover the missing ones), a data sample and the JSON definition, which you can edit.
+3. **Refine** in natural language as many times as you like and click **Salvar e publicar** (save and publish). The endpoints go live and into the docs immediately.
 
-A IA só desenha a estrutura (campos, tipos, dicas de geração); os registros são gerados no servidor, então dá para pedir milhares sem custo extra. Se a definição vier incoerente (ex.: referência a um recurso que não existe), o servidor devolve os erros à IA e pede a correção uma vez antes de mostrar a prévia.
+The AI only designs the structure (fields, types, generation hints); records are generated on the server, so you can ask for thousands at no extra cost. If the definition comes back inconsistent (for example, a reference to a resource that does not exist), the server sends the errors back to the AI and asks for one fix before showing the preview.
 
-Também é possível criar ou editar um módulo colando o JSON da definição (botão **Definição** no módulo).
+You can also create or edit a module by pasting its JSON definition (**Definição** button on the module).
 
-## Configurações
+## Configuration
 
-Só estas precisam ser variáveis de ambiente (existem antes de o app subir):
+Only these need to be environment variables (they exist before the app starts):
 
-| Variável | Padrão | O quê |
+| Variable | Default | What |
 | --- | --- | --- |
-| `APP_SECRET` | gerado e salvo em `DATA_DIR/.app-secret` | Assina sessões e JWT e cifra os segredos guardados. **Defina em produção.** Trocar desloga todo mundo e invalida as chaves de IA salvas. |
-| `PORT` | `4310` | Porta HTTP. |
-| `DATA_DIR` | `./data` (no Docker, `/app/data`) | Onde ficam o SQLite e o segredo gerado. |
-| `SETUP_TOKEN` | — | Se definido, o primeiro acesso exige este token. |
-| `TRUST_PROXY` | `1` | Quantos proxies confiar (Traefik = 1; com Cloudflare na frente, 2). |
-| `LOG_LEVEL` | `info` | Nível do log. |
+| `APP_SECRET` | generated and saved in `DATA_DIR/.app-secret` | Signs sessions and JWTs and encrypts stored secrets. **Set it in production.** Changing it logs everyone out and invalidates saved AI keys. |
+| `PORT` | `4310` | HTTP port. |
+| `DATA_DIR` | `./data` (in Docker, `/app/data`) | Where the SQLite database and the generated secret live. |
+| `SETUP_TOKEN` | — | If set, first access requires this token. |
+| `TRUST_PROXY` | `1` | How many proxies to trust (Traefik = 1; with Cloudflare in front, 2). |
+| `LOG_LEVEL` | `info` | Log level. |
 
-Todo o resto (nome do app, URL pública, CORS, exigir autenticação, validade de JWT e sessão, latência, taxa de erro, rate limit, paginação, idioma e semente dos dados, provedor, chave e modelo de IA, tabelas de INSS e IRRF…) está em **Configurações**. Cada item mostra de onde vem o valor (tela, env ou padrão). Qualquer um deles também aceita uma env como valor inicial (ex.: `PUBLIC_URL`, `ANTHROPIC_API_KEY`, `MOCK_LATENCY_MAX_MS`); o botão **Exportar .env** gera o arquivo com os nomes.
+Everything else (app name, public URL, CORS, require authentication, JWT and session lifetime, latency, error rate, rate limit, pagination, data locale and seed, AI provider, key and model, INSS and IRRF tables…) is in **Configurações**. Each item shows where its value comes from (panel, env or default). Any of them also accepts an env var as an initial value (for example `PUBLIC_URL`, `ANTHROPIC_API_KEY`, `MOCK_LATENCY_MAX_MS`); the **Exportar .env** button generates the file with the names.
 
-## Deploy no Dokploy
+## Deploy
 
-O `docker-compose.dokploy.yml` sobe um único serviço com o SQLite no volume `appdata`. O Traefik do Dokploy cuida do domínio e do HTTPS; o app entra na rede `dokploy-network` para ser alcançado.
+### Docker
 
-1. **Criar o serviço**: no projeto, *Create Service → Compose*. Em *Provider*, aponte para o repositório e o branch. Em *Compose Path*, use `./docker-compose.dokploy.yml`.
+The image runs the server and serves the built panel from a single container. Mount a volume at `/app/data` and set `APP_SECRET`:
+
+```bash
+docker build -t mock-api .
+docker run -d -p 4310:4310 -v mock-api-data:/app/data \
+  -e APP_SECRET="$(openssl rand -base64 48)" mock-api
+```
+
+### Dokploy
+
+`docker-compose.dokploy.yml` runs a single service with SQLite on the `appdata` volume. Dokploy's Traefik handles the domain and HTTPS; the app joins the `dokploy-network` network so it can be reached.
+
+1. **Create the service**: in the project, *Create Service → Compose*. Under *Provider*, point to the repository and branch. Under *Compose Path*, use `./docker-compose.dokploy.yml`.
 2. **Environment**:
 
-   | Variável | Obrigatória | O quê |
+   | Variable | Required | What |
    | --- | --- | --- |
-   | `APP_SECRET` | sim | Gere com `openssl rand -base64 48`. |
-   | `SETUP_TOKEN` | não | Protege a criação do primeiro admin. Recomendado se o domínio for público. |
-   | `PUBLIC_URL` | não | `https://seu-dominio`. Pode ser definido depois, na tela. |
-   | `TRUST_PROXY` | não | `1` (padrão). Com Cloudflare em modo proxy, `2`. |
-   | `ANTHROPIC_API_KEY`, `OPENAI_*`, `AI_PROVIDER` | não | Valores iniciais da IA; também configuráveis na tela. |
+   | `APP_SECRET` | yes | Generate with `openssl rand -base64 48`. |
+   | `SETUP_TOKEN` | no | Protects the creation of the first admin. Recommended if the domain is public. |
+   | `PUBLIC_URL` | no | `https://your-domain`. Can be set later in the panel. |
+   | `TRUST_PROXY` | no | `1` (default). With Cloudflare in proxy mode, `2`. |
+   | `ANTHROPIC_API_KEY`, `OPENAI_*`, `AI_PROVIDER` | no | Initial AI values; also configurable in the panel. |
 
-3. **Domains**: serviço `app`, porta `4310`, path `/`, HTTPS com Let's Encrypt.
-4. **Deploy**. Abra o domínio e crie o admin (com o `SETUP_TOKEN`, se definido).
+3. **Domains**: service `app`, port `4310`, path `/`, HTTPS with Let's Encrypt.
+4. **Deploy**. Open the domain and create the admin (with the `SETUP_TOKEN`, if set).
 
-Funciona também como *Application* com build type *Dockerfile*: mesma env, porta 4310 e um volume montado em `/app/data`.
+It also works as an *Application* with build type *Dockerfile*: same env, port 4310 and a volume mounted at `/app/data`.
 
-**Backup**: o banco é o arquivo `/app/data/mock-api.db` (modo WAL). Ligue o *Volume Backups* do Dokploy no volume `appdata` com destino S3. Os módulos prontos sempre podem ser recriados com **Resetar dados**; o que importa guardar são os usuários, chaves, configurações e módulos gerados.
+**Backup**: the database is the file `/app/data/mock-api.db` (WAL mode). Turn on Dokploy's *Volume Backups* for the `appdata` volume with an S3 destination. The ready-made modules can always be recreated with **Resetar dados** (reset data); what matters to keep is users, keys, settings and generated modules.
 
-## Estrutura
+## Project structure
 
 ```
-apps/server   Fastify + TypeScript (roda direto no Node 24, sem build), SQLite nativo (node:sqlite)
-  src/engine    motor genérico: definições → CRUD, consulta, validação (ajv), views, planos
-  src/modules   rh, filmes, livros (definição, seed, rotas e planos próprios)
-  src/openapi   spec 3.1 montada das definições + Swagger UI
-  src/ai        provedores (Anthropic, OpenAI-compatível), prompt, saída estruturada
-  src/images    SVG de pôster, backdrop, capa e avatar; PNG via resvg
-  src/settings  catálogo de configurações da tela, precedência e criptografia
-apps/web      React + Vite + Tailwind + TanStack Query (painel), Leaflet, Recharts, React Flow
+apps/server   Fastify + TypeScript (runs directly on Node 24, no build step), native SQLite (node:sqlite)
+  src/engine    generic engine: definitions → CRUD, query, validation (ajv), views, plans
+  src/modules   rh, filmes, livros (definition, seed, custom routes and plans)
+  src/openapi   OpenAPI 3.1 spec built from the definitions + Swagger UI
+  src/ai        providers (Anthropic, OpenAI-compatible), prompt, structured output
+  src/images    SVG posters, backdrops, covers and avatars; PNG via resvg
+  src/settings  panel settings catalog, precedence and encryption
+apps/web      React + Vite + Tailwind + TanStack Query (panel), Leaflet, Recharts, React Flow
 ```
 
-Todo módulo, pronto ou gerado, é um conjunto de definições de recurso (campos tipados + dicas de view). O mesmo motor tira dali o CRUD, a validação, as views e a OpenAPI. Por isso os módulos gerados por IA têm a mesma qualidade dos prontos sem código novo.
+Every module, ready-made or generated, is a set of resource definitions (typed fields + view hints). The same engine derives CRUD, validation, views and OpenAPI from them. That is why AI-generated modules have the same quality as the ready-made ones without new code.
+
+## Contributing
+
+Contributions are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request and follow the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues must **not** be reported in public issues: see [SECURITY.md](SECURITY.md).
+
+## License
+
+[Apache License 2.0](LICENSE). Third-party components distributed in the build are listed in [NOTICE](NOTICE). Generated data is fictitious; any resemblance to real people, companies or works is coincidental.

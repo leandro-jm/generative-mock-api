@@ -1,0 +1,59 @@
+name: Bug report
+description: Something does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! **Security issues must not be reported here**; see SECURITY.md.
+        Never paste real API keys, `APP_SECRET`, AI provider keys or personal data.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Include the request (method, path, headers without secrets, body) when the problem is in an API.
+      placeholder: |
+        1. pnpm dev
+        2. curl -H "X-API-Key: mk_..." "http://localhost:4310/api/v1/..."
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: 0.1.0 / abc1234
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      multiple: true
+      options:
+        - Mocked APIs (CRUD, query, auth)
+        - Views (table, card, form, plan, map, chart, diagram)
+        - Ready-made modules (RH, Filmes, Livros)
+        - Generate with AI
+        - OpenAPI / Swagger
+        - Web panel
+        - Deployment / Docker
+        - Docs
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Node version, browser (for panel issues), deployment method (dev, Docker, Dokploy), AI provider (if relevant).
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant log lines or responses (redact anything sensitive).
+      render: text

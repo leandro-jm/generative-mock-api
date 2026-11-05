@@ -1,5 +1,28 @@
 {
   "name": "mock-api",
+  "version": "0.1.0",
+  "description": "Fake-data APIs that follow OpenAPI 3.1, with views for front ends, AI-generated modules and a web panel.",
+  "license": "Apache-2.0",
+  "author": "Leandro Martins (https://github.com/leandro-jm)",
+  "homepage": "https://github.com/leandro-jm/generative-mock-api#readme",
+  "bugs": {
+    "url": "https://github.com/leandro-jm/generative-mock-api/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leandro-jm/generative-mock-api.git"
+  },
+  "keywords": [
+    "mock",
+    "mock-api",
+    "fake-data",
+    "openapi",
+    "swagger",
+    "rest",
+    "prototyping",
+    "ai",
+    "generative"
+  ],
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.5.1",

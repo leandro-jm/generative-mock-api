@@ -25,7 +25,7 @@ export function DocsPage() {
           </>
         }
       />
-      <iframe key={module} src={`/docs${module ? `?module=${module}` : ""}`} title="Swagger UI" className="h-[calc(100vh-12rem)] w-full rounded-xl border border-slate-200 bg-white dark:border-slate-800" />
+      <iframe key={module} src={`/docs${module ? `?module=${module}` : ""}`} title="Swagger UI" className="h-[calc(100vh-12rem)] w-full rounded-xl border border-line bg-surface" />
     </div>
   );
 }

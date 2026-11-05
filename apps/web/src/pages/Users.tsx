@@ -48,8 +48,8 @@ export function UsersPage() {
       {isLoading ? <Loading /> : (
         <Card className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs text-slate-500 uppercase dark:bg-slate-900"><tr><th className="px-4 py-2">Nome</th><th className="px-4 py-2">E-mail</th><th className="px-4 py-2">Papel</th><th className="px-4 py-2">Ativo</th><th className="px-4 py-2">Criado em</th><th /></tr></thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <thead className="bg-surface-2 text-left text-xs text-fg-3 uppercase"><tr><th className="px-4 py-2">Nome</th><th className="px-4 py-2">E-mail</th><th className="px-4 py-2">Papel</th><th className="px-4 py-2">Ativo</th><th className="px-4 py-2">Criado em</th><th /></tr></thead>
+            <tbody className="divide-y divide-line">
               {data?.data.map((u) => (
                 <tr key={u.id}>
                   <td className="px-4 py-2 font-medium">{u.name} {u.id === me.id && <Badge>você</Badge>}</td>
@@ -60,7 +60,7 @@ export function UsersPage() {
                     </Select>
                   </td>
                   <td className="px-4 py-2"><Switch checked={u.active} disabled={u.id === me.id} onChange={(v) => update(u, { active: v })} /></td>
-                  <td className="px-4 py-2 text-slate-500">{dateTime(u.created_at)}</td>
+                  <td className="px-4 py-2 text-fg-3">{dateTime(u.created_at)}</td>
                   <td className="px-4 py-2 text-right whitespace-nowrap">
                     <Button size="sm" variant="ghost" onClick={() => setEditing(u)}>Editar</Button>
                     {u.id !== me.id && <Button size="sm" variant="ghost" onClick={() => remove(u)}>Excluir</Button>}

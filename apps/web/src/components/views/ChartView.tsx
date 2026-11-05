@@ -1,24 +1,24 @@
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { Chart } from "../../lib/api";
 import { compact, money, number } from "../../lib/format";
-
-// Paleta categórica (ordem fixa) com contraste nos dois temas.
-const COLORS = ["#4f46e5", "#0891b2", "#ea580c", "#16a34a", "#db2777", "#7c3aed", "#ca8a04", "#0d9488"];
+import { useThemeColors } from "../../lib/theme";
 
 /** View chart: desenha { type, labels, series } com Recharts. */
 export function ChartView({ chart, height = 320 }: { chart: Chart; height?: number }) {
+  const t = useThemeColors();
+  const COLORS = t.series;
   const rows = chart.labels.map((label, i) => Object.fromEntries([["label", label], ...chart.series.map((s) => [s.name, s.data[i]])]));
   const fmt = (v: unknown) => (chart.unit === "BRL" ? money(v) : chart.unit === "%" ? `${number(v)}%` : number(v));
-  const axis = { stroke: "currentColor", fontSize: 11, tickLine: false, axisLine: false } as const;
-  const tooltip = <Tooltip formatter={(v) => fmt(v)} contentStyle={{ borderRadius: 8, fontSize: 12 }} />;
+  const axis = { stroke: t.text3, tick: { fill: t.text3 }, fontSize: 11, tickLine: false, axisLine: false } as const;
+  const tooltip = <Tooltip formatter={(v) => fmt(v)} contentStyle={{ borderRadius: 8, fontSize: 12, background: t.surface, border: `1px solid ${t.borderStrong}`, color: t.text, boxShadow: t.shadow }} itemStyle={{ color: t.text }} labelStyle={{ color: t.text3 }} cursor={{ fill: t.grid, fillOpacity: 0.4, stroke: t.borderStrong }} />;
   const multi = chart.series.length > 1;
 
   return (
-    <div className="text-slate-500" style={{ height }}>
+    <div className="text-fg-3" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         {chart.type === "pie" ? (
           <PieChart>
-            <Pie isAnimationActive={false} data={chart.labels.map((l, i) => ({ name: l, value: chart.series[0]?.data[i] ?? 0 }))} dataKey="value" nameKey="name" innerRadius="45%" outerRadius="80%" paddingAngle={1}>
+            <Pie isAnimationActive={false} data={chart.labels.map((l, i) => ({ name: l, value: chart.series[0]?.data[i] ?? 0 }))} dataKey="value" nameKey="name" innerRadius="45%" outerRadius="80%" paddingAngle={1} stroke={t.surface}>
               {chart.labels.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
             </Pie>
             {tooltip}
@@ -26,7 +26,7 @@ export function ChartView({ chart, height = 320 }: { chart: Chart; height?: numb
           </PieChart>
         ) : chart.type === "line" ? (
           <LineChart data={rows} margin={{ top: 8, right: 16, bottom: 0, left: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+            <CartesianGrid strokeDasharray="3 3" stroke={t.grid} />
             <XAxis dataKey="label" {...axis} />
             <YAxis {...axis} tickFormatter={(v) => compact(v, chart.unit)} width={84} />
             {tooltip}
@@ -35,7 +35,7 @@ export function ChartView({ chart, height = 320 }: { chart: Chart; height?: numb
           </LineChart>
         ) : chart.type === "area" ? (
           <AreaChart data={rows} margin={{ top: 8, right: 16, bottom: 0, left: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} />
+            <CartesianGrid strokeDasharray="3 3" stroke={t.grid} />
             <XAxis dataKey="label" {...axis} />
             <YAxis {...axis} tickFormatter={(v) => compact(v, chart.unit)} width={84} />
             {tooltip}
@@ -44,7 +44,7 @@ export function ChartView({ chart, height = 320 }: { chart: Chart; height?: numb
           </AreaChart>
         ) : (
           <BarChart data={rows} margin={{ top: 8, right: 16, bottom: 0, left: 8 }}>
-            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.2} vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={t.grid} vertical={false} />
             <XAxis dataKey="label" {...axis} interval={0} angle={rows.length > 6 ? -30 : 0} textAnchor={rows.length > 6 ? "end" : "middle"} height={rows.length > 6 ? 70 : 30} />
             <YAxis {...axis} tickFormatter={(v) => compact(v, chart.unit)} width={84} />
             {tooltip}

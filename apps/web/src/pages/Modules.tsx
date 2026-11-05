@@ -43,17 +43,17 @@ export function ModulesPage() {
           <Card key={m.slug} className="flex flex-col p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <Link to={`/modulos/${m.slug}`} className="font-semibold hover:text-indigo-600">{m.title}</Link>
-                <p className="font-mono text-xs text-slate-500">/api/v1/{m.slug}</p>
+                <Link to={`/modulos/${m.slug}`} className="font-semibold hover:underline decoration-line-strong underline-offset-2">{m.title}</Link>
+                <p className="font-mono text-xs text-fg-3">/api/v1/{m.slug}</p>
               </div>
               <div className="flex items-center gap-2">
-                <Badge tone={m.source === "builtin" ? "indigo" : m.source === "ai" ? "amber" : "slate"}>{SOURCE_LABEL[m.source]}</Badge>
+                <Badge tone={m.source === "builtin" ? "accent" : m.source === "ai" ? "amber" : "slate"}>{SOURCE_LABEL[m.source]}</Badge>
                 <Switch checked={m.enabled} onChange={(v) => toggle(m, v)} disabled={!canEdit} label="Ligado" />
               </div>
             </div>
-            <p className="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-400">{m.description}</p>
+            <p className="mt-2 line-clamp-3 text-sm text-fg-2">{m.description}</p>
             <div className="mt-3"><ViewBadges views={m.views} /></div>
-            <p className="mt-3 text-xs text-slate-500">{m.resources.length} recursos · {number(m.resources.reduce((a, r) => a + r.count, 0))} registros</p>
+            <p className="mt-3 text-xs text-fg-3">{m.resources.length} recursos · {number(m.resources.reduce((a, r) => a + r.count, 0))} registros</p>
             <div className="mt-auto flex gap-2 pt-4">
               <Link to={`/modulos/${m.slug}`}><Button variant="secondary" size="sm">Abrir</Button></Link>
               <Link to={`/views?module=${m.slug}`}><Button variant="secondary" size="sm">Views</Button></Link>

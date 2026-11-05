@@ -1,0 +1,28 @@
+mock-api
+Copyright 2026 Leandro Martins
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This product includes third-party software distributed in its build artifacts
+(the Docker image and the web panel bundle). Each component keeps its own license;
+see the corresponding package in node_modules for the full text.
+
+- Geist Sans and Geist Mono fonts, bundled in the web panel
+  (via @fontsource/geist-sans and @fontsource/geist-mono).
+  Copyright 2023 Vercel, made in collaboration with basement.studio. Licensed under
+  the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
+
+- Swagger UI (swagger-ui-dist), served at /docs.
+  Copyright SmartBear Software. Licensed under the Apache License, Version 2.0.
+
+- DejaVu fonts (Debian package fonts-dejavu-core), installed in the Docker image
+  to render the generated images. Bitstream Vera and Arev font licenses
+  (permissive; see /usr/share/doc/fonts-dejavu-core/copyright in the image).
+
+Map tiles shown in the web panel are loaded at runtime from OpenStreetMap
+(https://www.openstreetmap.org/copyright); map data © OpenStreetMap contributors,
+available under the Open Database License. They are not distributed with this product.
+
+Sample data (names, titles, documents such as CPF, CNPJ, PIS and ISBN) is generated
+at runtime from a seed. It is fictitious: any resemblance to real people, companies
+or works is coincidental.

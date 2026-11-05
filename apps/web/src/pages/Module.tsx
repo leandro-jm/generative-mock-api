@@ -75,28 +75,28 @@ export function ModulePage() {
         }
       />
       <div className="flex flex-wrap items-center gap-3">
-        <Badge tone={m.source === "builtin" ? "indigo" : "amber"}>{SOURCE_LABEL[m.source]}</Badge>
+        <Badge tone={m.source === "builtin" ? "accent" : "amber"}>{SOURCE_LABEL[m.source]}</Badge>
         {!m.enabled && <Badge tone="rose">Desligado</Badge>}
         <ViewBadges views={m.views} />
-        <Link to={`/views?module=${slug}`} className="text-sm text-indigo-600 hover:underline">Abrir na galeria de views →</Link>
+        <Link to={`/views?module=${slug}`} className="text-sm text-fg underline decoration-line-strong underline-offset-2 hover:decoration-fg">Abrir na galeria de views →</Link>
       </div>
-      {m.prompt && <p className="text-sm text-slate-500"><b>Prompt:</b> {m.prompt}</p>}
+      {m.prompt && <p className="text-sm text-fg-2"><b>Prompt:</b> {m.prompt}</p>}
 
       <Card className="p-4">
-        <Tabs tabs={m.resources.map((r) => ({ value: r.slug, label: <>{r.labelPlural} <span className="text-xs text-slate-400">{number(r.count)}</span></> }))} value={current} onChange={setResource} />
+        <Tabs tabs={m.resources.map((r) => ({ value: r.slug, label: <>{r.labelPlural} <span className="text-xs text-fg-3">{number(r.count)}</span></> }))} value={current} onChange={setResource} />
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <code className="text-xs text-slate-500">GET /api/v1/{slug}/{current}</code>
+            <code className="text-xs text-fg-3">GET /api/v1/{slug}/{current}</code>
             {canEdit && <Button size="sm" onClick={() => setEditing("new")}><Plus className="size-4" /> Novo</Button>}
           </div>
           <ErrorBox error={planError} />
-          {m.enabled ? <DataTable key={current} module={slug} resource={current} onEdit={canEdit ? setEditing : undefined} onDelete={canEdit ? askDelete : undefined} /> : <p className="text-sm text-slate-500">Ligue o módulo para ver e editar os dados.</p>}
+          {m.enabled ? <DataTable key={current} module={slug} resource={current} onEdit={canEdit ? setEditing : undefined} onDelete={canEdit ? askDelete : undefined} /> : <p className="text-sm text-fg-2">Ligue o módulo para ver e editar os dados.</p>}
         </div>
       </Card>
 
       <Card className="p-5">
         <h2 className="font-semibold">Endpoints principais</h2>
-        <div className="mt-3 grid gap-x-6 gap-y-1 font-mono text-xs text-slate-600 md:grid-cols-2 dark:text-slate-400">
+        <div className="mt-3 grid gap-x-6 gap-y-1 font-mono text-xs text-fg-2 md:grid-cols-2">
           {m.resources.map((r) => <span key={r.slug}>GET|POST /api/v1/{slug}/{r.slug} · GET|PUT|PATCH|DELETE …/{"{id}"}</span>)}
           <span>GET /api/v1/{slug}/{"{recurso}"}/_views/{"{table|card|form|map|chart}"}</span>
           <span>GET /api/v1/{slug}/_views/charts · /_views/diagrams</span>
@@ -137,7 +137,7 @@ function DefinitionModal({ m, onClose, onSaved }: { m: ModuleDetail; onClose: ()
     }
   };
   return (
-    <Modal open onClose={onClose} title="Definição do módulo (JSON)" wide footer={<><label className="mr-auto flex items-center gap-2 text-sm"><input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} className="accent-indigo-600" /> Regerar os dados</label><Button variant="secondary" onClick={onClose}>Cancelar</Button><Button loading={saving} onClick={save}>Salvar</Button></>}>
+    <Modal open onClose={onClose} title="Definição do módulo (JSON)" wide footer={<><label className="mr-auto flex items-center gap-2 text-sm"><input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} className="accent-[var(--accent)]" /> Regerar os dados</label><Button variant="secondary" onClick={onClose}>Cancelar</Button><Button loading={saving} onClick={save}>Salvar</Button></>}>
       <div className="space-y-3">
         <ErrorBox error={error} />
         <Textarea value={text} onChange={(e) => setText(e.target.value)} className="min-h-[55vh] font-mono text-xs" spellCheck={false} />
@@ -170,7 +170,7 @@ function MoreDataModal({ m, onClose, onSaved }: { m: ModuleDetail; onClose: () =
       <div className="space-y-4">
         <ErrorBox error={error} />
         <Field label="Recurso">
-          <select className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" value={resource} onChange={(e) => setResource(e.target.value)}>
+          <select className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm" value={resource} onChange={(e) => setResource(e.target.value)}>
             {m.resources.map((r) => <option key={r.slug} value={r.slug}>{r.labelPlural}</option>)}
           </select>
         </Field>

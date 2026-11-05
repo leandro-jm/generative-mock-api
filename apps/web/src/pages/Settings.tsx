@@ -10,7 +10,7 @@ interface SettingsResponse {
   boot: { port: number; dataDir: string; trustProxy: number; appSecret: string; setupToken: boolean; production: boolean };
 }
 
-const SOURCE = { ui: { label: "tela", tone: "indigo" as const }, env: { label: "env", tone: "amber" as const }, default: { label: "padrão", tone: "slate" as const } };
+const SOURCE = { ui: { label: "tela", tone: "accent" as const }, env: { label: "env", tone: "amber" as const }, default: { label: "padrão", tone: "slate" as const } };
 
 function SettingInput({ s, value, onChange }: { s: SettingView; value: unknown; onChange: (v: unknown) => void }) {
   switch (s.type) {
@@ -99,7 +99,7 @@ export function SettingsPage() {
             <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
               <div>
                 <h2 className="font-semibold">{g.label}</h2>
-                <p className="text-sm text-slate-500">{g.description}</p>
+                <p className="text-sm text-fg-2">{g.description}</p>
               </div>
               <div className="flex gap-2">
                 {g.id === "ai" && <Button variant="secondary" loading={testing} onClick={testAi}>Testar conexão</Button>}
@@ -116,7 +116,7 @@ export function SettingsPage() {
                         <Badge tone={SOURCE[s.source].tone}>{SOURCE[s.source].label}</Badge>
                         {s.env && <code className="text-[11px]">{s.env}</code>}
                         <span>{s.description}</span>
-                        {s.source === "ui" && <button type="button" className="inline-flex items-center gap-0.5 text-indigo-600 hover:underline" onClick={() => reset(s)}><RotateCcw className="size-3" /> restaurar</button>}
+                        {s.source === "ui" && <button type="button" className="inline-flex items-center gap-0.5 text-fg underline decoration-line-strong underline-offset-2 hover:decoration-fg" onClick={() => reset(s)}><RotateCcw className="size-3" /> restaurar</button>}
                       </span>
                     }
                   >
@@ -130,14 +130,14 @@ export function SettingsPage() {
       })}
       <Card className="p-5">
         <h2 className="font-semibold">Só por variável de ambiente</h2>
-        <p className="text-sm text-slate-500">Precisam existir antes de o app subir. No Dokploy, ficam na aba Environment.</p>
+        <p className="text-sm text-fg-2">Precisam existir antes de o app subir. No Dokploy, ficam na aba Environment.</p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-          <div><dt className="font-mono text-xs text-slate-500">APP_SECRET</dt><dd>{data.boot.appSecret}</dd></div>
-          <div><dt className="font-mono text-xs text-slate-500">PORT</dt><dd>{data.boot.port}</dd></div>
-          <div><dt className="font-mono text-xs text-slate-500">DATA_DIR</dt><dd className="break-all">{data.boot.dataDir}</dd></div>
-          <div><dt className="font-mono text-xs text-slate-500">TRUST_PROXY</dt><dd>{data.boot.trustProxy}</dd></div>
-          <div><dt className="font-mono text-xs text-slate-500">SETUP_TOKEN</dt><dd>{data.boot.setupToken ? "definido" : "não definido"}</dd></div>
-          <div><dt className="font-mono text-xs text-slate-500">NODE_ENV</dt><dd>{data.boot.production ? "production" : "development"}</dd></div>
+          <div><dt className="font-mono text-xs text-fg-3">APP_SECRET</dt><dd>{data.boot.appSecret}</dd></div>
+          <div><dt className="font-mono text-xs text-fg-3">PORT</dt><dd>{data.boot.port}</dd></div>
+          <div><dt className="font-mono text-xs text-fg-3">DATA_DIR</dt><dd className="break-all">{data.boot.dataDir}</dd></div>
+          <div><dt className="font-mono text-xs text-fg-3">TRUST_PROXY</dt><dd>{data.boot.trustProxy}</dd></div>
+          <div><dt className="font-mono text-xs text-fg-3">SETUP_TOKEN</dt><dd>{data.boot.setupToken ? "definido" : "não definido"}</dd></div>
+          <div><dt className="font-mono text-xs text-fg-3">NODE_ENV</dt><dd>{data.boot.production ? "production" : "development"}</dd></div>
         </dl>
       </Card>
     </div>

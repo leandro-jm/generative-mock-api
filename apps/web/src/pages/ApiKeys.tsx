@@ -37,18 +37,18 @@ export function ApiKeysPage() {
       {keys.isLoading ? <Loading /> : (
         <Card className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs text-slate-500 uppercase dark:bg-slate-900">
+            <thead className="bg-surface-2 text-left text-xs text-fg-3 uppercase">
               <tr><th className="px-4 py-2">Nome</th><th className="px-4 py-2">Prefixo</th><th className="px-4 py-2">Scopes</th>{all && <th className="px-4 py-2">Dono</th>}<th className="px-4 py-2">Último uso</th><th className="px-4 py-2">Expira</th><th /></tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+            <tbody className="divide-y divide-line">
               {keys.data?.data.map((k) => (
                 <tr key={k.id}>
                   <td className="px-4 py-2 font-medium">{k.name} {k.revoked_at && <Badge tone="rose">revogada</Badge>}</td>
                   <td className="px-4 py-2 font-mono text-xs">{k.prefix}…</td>
-                  <td className="px-4 py-2"><div className="flex flex-wrap gap-1">{k.scopes.map((s) => <Badge key={s} tone="indigo">{s}</Badge>)}</div></td>
+                  <td className="px-4 py-2"><div className="flex flex-wrap gap-1">{k.scopes.map((s) => <Badge key={s} tone="accent">{s}</Badge>)}</div></td>
                   {all && <td className="px-4 py-2">{k.user_name}</td>}
-                  <td className="px-4 py-2 text-slate-500">{k.last_used_at ? dateTime(k.last_used_at) : "nunca"}</td>
-                  <td className="px-4 py-2 text-slate-500">{k.expires_at ? dateTime(k.expires_at) : "não expira"}</td>
+                  <td className="px-4 py-2 text-fg-3">{k.last_used_at ? dateTime(k.last_used_at) : "nunca"}</td>
+                  <td className="px-4 py-2 text-fg-3">{k.expires_at ? dateTime(k.expires_at) : "não expira"}</td>
                   <td className="px-4 py-2 text-right whitespace-nowrap">
                     {!k.revoked_at && <Button size="sm" variant="ghost" onClick={() => revoke(k)}>Revogar</Button>}
                     <Button size="sm" variant="ghost" onClick={() => remove(k)}>Excluir</Button>
@@ -57,14 +57,14 @@ export function ApiKeysPage() {
               ))}
             </tbody>
           </table>
-          {keys.data?.data.length === 0 && <p className="p-6 text-center text-sm text-slate-500">Nenhuma chave ainda.</p>}
+          {keys.data?.data.length === 0 && <p className="p-6 text-center text-sm text-fg-2">Nenhuma chave ainda.</p>}
         </Card>
       )}
       {open && <NewKeyModal onClose={() => setOpen(false)} onCreated={async (s) => { setOpen(false); setSecret(s); await qc.invalidateQueries({ queryKey: ["api-keys"] }); }} />}
       <Modal open={secret !== null} onClose={() => setSecret(null)} title="Chave criada" footer={<Button onClick={() => setSecret(null)}>Já copiei</Button>}>
         <div className="space-y-3">
           <p className="text-sm">Copie agora: o segredo não será mostrado de novo.</p>
-          <div className="flex items-center gap-2"><code className="flex-1 rounded bg-slate-100 p-2 font-mono text-xs break-all dark:bg-slate-800">{secret}</code><CopyButton text={secret ?? ""} /></div>
+          <div className="flex items-center gap-2"><code className="flex-1 rounded bg-surface-2 p-2 font-mono text-xs break-all">{secret}</code><CopyButton text={secret ?? ""} /></div>
           <Code>{`curl -H "X-API-Key: ${secret}" ${location.origin}/api/v1/filmes/filmes?limit=3`}</Code>
         </div>
       </Modal>
@@ -109,13 +109,13 @@ function NewKeyModal({ onClose, onCreated }: { onClose: () => void; onCreated: (
           </Select>
         </Field>
         {preset === "custom" && (
-          <div className="space-y-2 rounded-lg border border-slate-200 p-3 dark:border-slate-800">
+          <div className="space-y-2 rounded-lg border border-line p-3">
             {modules.data?.data.map((m) => (
               <div key={m.slug} className="flex items-center justify-between text-sm">
                 <span>{m.title}</span>
                 <span className="flex gap-3">
                   {(["read", "write"] as const).filter((x) => user.role !== "viewer" || x === "read").map((mode) => (
-                    <label key={mode} className="flex items-center gap-1"><input type="checkbox" className="accent-indigo-600" checked={custom.includes(`${m.slug}:${mode}`)} onChange={() => toggle(`${m.slug}:${mode}`)} />{mode === "read" ? "ler" : "escrever"}</label>
+                    <label key={mode} className="flex items-center gap-1"><input type="checkbox" className="accent-[var(--accent)]" checked={custom.includes(`${m.slug}:${mode}`)} onChange={() => toggle(`${m.slug}:${mode}`)} />{mode === "read" ? "ler" : "escrever"}</label>
                   ))}
                 </span>
               </div>

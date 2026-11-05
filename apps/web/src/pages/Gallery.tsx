@@ -16,7 +16,7 @@ import { DiagramView } from "../components/views/DiagramView";
 
 /** Mostra o endpoint usado (para copiar no front). */
 function Endpoint({ url, method = "GET" }: { url: string; method?: string }) {
-  return <p className="font-mono text-xs text-slate-500"><span className="font-semibold text-indigo-600">{method}</span> {url}</p>;
+  return <p className="font-mono text-xs text-fg-3"><span className="font-semibold text-fg">{method}</span> {url}</p>;
 }
 
 function ResourcePicker({ m, value, onChange, filter, order }: { m: ModuleDetail; value: string; onChange: (v: string) => void; filter?: (r: ModuleDetail["definition"]["resources"][0]) => boolean; order?: string[] }) {
@@ -105,7 +105,7 @@ function FormTab({ m }: { m: ModuleDetail }) {
       {r && (
         <>
           <Endpoint url={`/api/v1/${m.slug}/${r}/_views/form?mode=create`} />
-          {user.role === "viewer" && <p className="text-sm text-amber-700">Seu papel (viewer) não permite salvar; o formulário é só para visualizar.</p>}
+          {user.role === "viewer" && <p className="text-sm text-warning">Seu papel (viewer) não permite salvar; o formulário é só para visualizar.</p>}
           <div className="max-w-3xl">
             <DynamicForm key={`${r}-${n}`} module={m.slug} resource={r} onSaved={(rec) => { toast(`Criado #${rec.id}.`); setN(n + 1); qc.invalidateQueries({ queryKey: ["table", m.slug] }); }} />
           </div>
@@ -120,7 +120,7 @@ function ParamInput({ name, schema, value, onChange }: { name: string; schema: R
   const label = `${(schema.label as string) ?? name}${schema.description ? ` — ${schema.description}` : ""}`;
   if (enumValues) return <Field label={label}><Select value={String(value ?? schema.default ?? "")} onChange={(e) => onChange(e.target.value)}>{enumValues.map((v) => <option key={v} value={v}>{v}</option>)}</Select></Field>;
   if (schema.type === "number" || schema.type === "integer") return <Field label={label}><Input type="number" value={String(value ?? schema.default ?? "")} onChange={(e) => onChange(e.target.value === "" ? undefined : Number(e.target.value))} /></Field>;
-  if (schema.type === "boolean") return <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="accent-indigo-600" checked={Boolean(value ?? schema.default)} onChange={(e) => onChange(e.target.checked)} /> {label}</label>;
+  if (schema.type === "boolean") return <label className="flex items-center gap-2 text-sm"><input type="checkbox" className="accent-[var(--accent)]" checked={Boolean(value ?? schema.default)} onChange={(e) => onChange(e.target.checked)} /> {label}</label>;
   return <Field label={label}><Input type={schema.format === "date" ? "date" : "text"} value={String(value ?? "")} onChange={(e) => onChange(e.target.value || undefined)} /></Field>;
 }
 
@@ -163,10 +163,10 @@ function PlanTab({ m }: { m: ModuleDetail }) {
             {m.planActions.map((a, i) => <option key={`${a.action}-${a.resource}`} value={i}>{a.title}</option>)}
           </Select>
         </Field>
-        <p className="text-sm text-slate-500">{action.description}</p>
+        <p className="text-sm text-fg-2">{action.description}</p>
         <Field label="IDs alvo" help="Separados por vírgula. Ignorado se houver filtro."><Input value={ids} onChange={(e) => setIds(e.target.value)} /></Field>
         <Field label="Filtro (opcional)" help="Um por linha, como na listagem: status=Ativo, preco[gte]=50">
-          <textarea className="w-full rounded-lg border border-slate-300 bg-white p-2 font-mono text-xs dark:border-slate-700 dark:bg-slate-900" rows={3} value={filter} onChange={(e) => setFilter(e.target.value)} />
+          <textarea className="w-full rounded-lg border border-line-strong bg-surface p-2 font-mono text-xs" rows={3} value={filter} onChange={(e) => setFilter(e.target.value)} />
         </Field>
         {Object.entries(props).map(([k, s]) => <ParamInput key={k} name={k} schema={s} value={values[k]} onChange={(v) => setValues((x) => ({ ...x, [k]: v }))} />)}
         <Button loading={busy} onClick={build}>Gerar plano</Button>
@@ -208,7 +208,7 @@ function ChartTab({ m }: { m: ModuleDetail }) {
 function ChartCard({ url, title }: { url: string; title: string }) {
   const { data, error } = useQuery({ queryKey: ["chart", url], queryFn: () => get<Chart>(url) });
   return (
-    <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+    <div className="rounded-xl border border-line p-4">
       <p className="font-medium">{title}</p>
       <Endpoint url={url} />
       <ErrorBox error={error} />
@@ -230,7 +230,7 @@ function DiagramTab({ m }: { m: ModuleDetail }) {
       </Select>
       {current && <Endpoint url={current.url} />}
       <ErrorBox error={d.error} />
-      {d.isLoading ? <Loading /> : d.data && <><p className="text-sm text-slate-500">{d.data.description} {d.data.nodes.length} nós, {d.data.edges.length} arestas.</p><DiagramView diagram={d.data} /></>}
+      {d.isLoading ? <Loading /> : d.data && <><p className="text-sm text-fg-2">{d.data.description} {d.data.nodes.length} nós, {d.data.edges.length} arestas.</p><DiagramView diagram={d.data} /></>}
     </div>
   );
 }

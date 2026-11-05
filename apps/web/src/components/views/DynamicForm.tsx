@@ -13,9 +13,9 @@ function Widget({ name, ui, value, onChange }: { name: string; ui: UiField; valu
     case "currency":
       return (
         <div className="flex items-center gap-2">
-          {ui.prefix && <span className="text-sm text-slate-500">{ui.prefix}</span>}
+          {ui.prefix && <span className="text-sm text-fg-2">{ui.prefix}</span>}
           <Input type="number" step={ui.widget === "currency" ? "0.01" : "any"} min={ui.min} max={ui.max} value={str} onChange={(e) => onChange(e.target.value === "" ? null : Number(e.target.value))} />
-          {ui.suffix && <span className="text-sm text-slate-500">{ui.suffix}</span>}
+          {ui.suffix && <span className="text-sm text-fg-2">{ui.suffix}</span>}
         </div>
       );
     case "switch":
@@ -31,7 +31,7 @@ function Widget({ name, ui, value, onChange }: { name: string; ui: UiField; valu
         <div className="flex flex-wrap gap-3 pt-1">
           {ui.options?.map((o) => (
             <label key={String(o.value)} className="flex items-center gap-1.5 text-sm">
-              <input type="radio" name={name} checked={value === o.value} onChange={() => onChange(o.value)} className="accent-indigo-600" />
+              <input type="radio" name={name} checked={value === o.value} onChange={() => onChange(o.value)} className="accent-[var(--accent)]" />
               {o.label}
             </label>
           ))}
@@ -47,10 +47,10 @@ function Widget({ name, ui, value, onChange }: { name: string; ui: UiField; valu
     case "multiselect": {
       const arr = Array.isArray(value) ? value : [];
       return (
-        <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-slate-300 p-2 dark:border-slate-700">
+        <div className="max-h-40 space-y-1 overflow-y-auto rounded-lg border border-line-strong p-2">
           {ui.options?.map((o) => (
             <label key={String(o.value)} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" className="accent-indigo-600" checked={arr.includes(o.value)} onChange={(e) => onChange(e.target.checked ? [...arr, o.value] : arr.filter((x) => x !== o.value))} />
+              <input type="checkbox" className="accent-[var(--accent)]" checked={arr.includes(o.value)} onChange={(e) => onChange(e.target.checked ? [...arr, o.value] : arr.filter((x) => x !== o.value))} />
               {o.label}
             </label>
           ))}
@@ -91,7 +91,7 @@ function JsonInput({ value, onChange }: { value: unknown; onChange: (v: unknown)
   const [bad, setBad] = useState(false);
   return (
     <Textarea
-      className={cx("font-mono text-xs", bad && "border-rose-400")}
+      className={cx("font-mono text-xs", bad && "border-danger-border")}
       value={text}
       onChange={(e) => {
         setText(e.target.value);
@@ -147,7 +147,7 @@ export function DynamicForm({ module, resource, id, onSaved, onCancel }: { modul
   const current = data.steps[step] ?? data.steps[0];
   return (
     <div className="space-y-4">
-      {data.steps.length > 1 && <Tabs tabs={data.steps.map((s, i) => ({ value: String(i), label: <span className={stepHasError(i) ? "text-rose-600" : ""}>{i + 1}. {s.title}</span> }))} value={String(step)} onChange={(v) => setStep(Number(v))} />}
+      {data.steps.length > 1 && <Tabs tabs={data.steps.map((s, i) => ({ value: String(i), label: <span className={stepHasError(i) ? "text-danger" : ""}>{i + 1}. {s.title}</span> }))} value={String(step)} onChange={(v) => setStep(Number(v))} />}
       <ErrorBox error={saveError} />
       <div className="grid gap-4 sm:grid-cols-2">
         {current.fields.map((name) => {
@@ -161,7 +161,7 @@ export function DynamicForm({ module, resource, id, onSaved, onCancel }: { modul
           );
         })}
       </div>
-      <div className="flex justify-between gap-2 border-t border-slate-200 pt-4 dark:border-slate-800">
+      <div className="flex justify-between gap-2 border-t border-line pt-4">
         <div>{onCancel && <Button variant="ghost" onClick={onCancel}>Cancelar</Button>}</div>
         <div className="flex gap-2">
           {step > 0 && <Button variant="secondary" onClick={() => setStep(step - 1)}>Voltar</Button>}
